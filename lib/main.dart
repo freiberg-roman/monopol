@@ -38,18 +38,15 @@ class Transaction {
 class AccountState extends ChangeNotifier {
   int _current_money = 0;
   List<Transaction> _transaction_history = [];
-  int entered_amount = 0;
 
-  void receive() {
-    var amount = this.entered_amount;
+  void receive(int amount) {
     Transaction trans = Transaction(amount, _current_money);
     _transaction_history.add(trans);
     _current_money += amount;
     notifyListeners();
   }
 
-  void send() {
-    var amount = this.entered_amount;
+  void send(int amount) {
     Transaction trans = Transaction(-amount, _current_money);
     _transaction_history.add(trans);
     _current_money -= amount;
@@ -61,18 +58,14 @@ class AccountState extends ChangeNotifier {
     _transaction_history.removeRange(index, _transaction_history.length);
     notifyListeners();
   }
-
-  void set_entered_amount(int amount) {
-    entered_amount = amount;
-  }
 }
 
 class MyHomePage extends StatelessWidget {
-  int entered_amount = 0;
-
   @override
   Widget build(BuildContext context) {
     var accState = context.watch<AccountState>();
+    var msgController = TextEditingController();
+    var myFocusNode = FocusNode();
 
     return Scaffold(
       body: SafeArea(
@@ -144,19 +137,15 @@ class MyHomePage extends StatelessWidget {
             Padding(
                 padding: const EdgeInsets.all(20),
                 child: TextFormField(
+                  controller: msgController,
                     keyboardType: TextInputType.number,
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly
                     ],
-                    onSaved: (newValue) {
-                      accState.set_entered_amount(int.parse(newValue ?? '0'));
-                    },
-                    onChanged: (String? value) {
-                      accState.set_entered_amount(int.parse(value ?? '0'));
-                    },
                     onFieldSubmitted: (String? input) {
-                      accState.set_entered_amount(int.parse(input ?? '0'));
+                      msgController.clear();
                     },
+                    focusNode: myFocusNode,
                     decoration: const InputDecoration(
                       icon: Icon(Icons.attach_money),
                       hintText: 'Enter amount to be sent or received',
@@ -175,7 +164,8 @@ class MyHomePage extends StatelessWidget {
                       size: 50.0,
                     ),
                     onPressed: () {
-                      accState.receive();
+                      accState.receive(int.parse(msgController.text ?? '0'));
+                      FocusScope.of(context).unfocus();
                     },
                   ),
                   SizedBox(width: 50.0),
@@ -185,7 +175,8 @@ class MyHomePage extends StatelessWidget {
                       size: 50.0,
                     ),
                     onPressed: () {
-                      accState.send();
+                      accState.send(int.parse(msgController.text ?? '0'));
+                      FocusScope.of(context).unfocus();
                     },
                   ),
                 ],

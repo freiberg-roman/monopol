@@ -1,7 +1,16 @@
-# Monopoly bank account simulation
+# monopoly_banking
 
-Just a simplified calculator. Together with a few friends, we figured out that we
-could speed up most of the game by using a calculator to keep track of in-game transactions
-instead of using the usual bills. This app is basically just that... a simulated
-in-game bank account with a simple history feature. This app doesn't prevent you from
-cheating, because it wasn't designed for children.
+A new Flutter project.
+
+## Getting Started
+
+This project is a starting point for a Flutter application.
+
+A few resources to get you started if this is your first Flutter project:
+
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.

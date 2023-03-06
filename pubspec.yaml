@@ -1,4 +1,4 @@
-name: monopoly_banking
+name: monopoly
 description: Simple accounting application for Monopoly like games.
 publish_to: 'none'
 version: 0.0.1+1

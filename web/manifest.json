@@ -1,6 +1,6 @@
 {
-    "name": "monopoly_banking",
-    "short_name": "monopoly_banking",
+    "name": "monopol",
+    "short_name": "monopol",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -65,7 +65,6 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var accState = context.watch<AccountState>();
     var msgController = TextEditingController();
-    var myFocusNode = FocusNode();
 
     return Scaffold(
       body: SafeArea(
@@ -80,7 +79,9 @@ class MyHomePage extends StatelessWidget {
                     child: Text('Transactions '
                         '${accState._transaction_history.length}:'),
                   ),
-                  for (var i = 0; i < accState._transaction_history.length; i++)
+                  for (var i = accState._transaction_history.length - 1;
+                      i >= 0;
+                      i--)
                     ListTile(
                       leading: IconButton(
                           icon: Icon(Icons.sync, semanticLabel: 'Delete'),
@@ -137,7 +138,7 @@ class MyHomePage extends StatelessWidget {
             Padding(
                 padding: const EdgeInsets.all(20),
                 child: TextFormField(
-                  controller: msgController,
+                    controller: msgController,
                     keyboardType: TextInputType.number,
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly
@@ -145,7 +146,6 @@ class MyHomePage extends StatelessWidget {
                     onFieldSubmitted: (String? input) {
                       msgController.clear();
                     },
-                    focusNode: myFocusNode,
                     decoration: const InputDecoration(
                       icon: Icon(Icons.attach_money),
                       hintText: 'Enter amount to be sent or received',
@@ -165,7 +165,7 @@ class MyHomePage extends StatelessWidget {
                     ),
                     onPressed: () {
                       accState.receive(int.parse(msgController.text ?? '0'));
-                      FocusScope.of(context).unfocus();
+                      FocusManager.instance.primaryFocus?.unfocus();
                     },
                   ),
                   SizedBox(width: 50.0),
@@ -176,7 +176,7 @@ class MyHomePage extends StatelessWidget {
                     ),
                     onPressed: () {
                       accState.send(int.parse(msgController.text ?? '0'));
-                      FocusScope.of(context).unfocus();
+                      FocusManager.instance.primaryFocus?.unfocus();
                     },
                   ),
                 ],

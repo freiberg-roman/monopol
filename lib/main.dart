@@ -61,132 +61,179 @@ class AccountState extends ChangeNotifier {
 }
 
 class MyHomePage extends StatelessWidget {
+  final TextEditingController msgController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    var accState = context.watch<AccountState>();
-    var msgController = TextEditingController();
-
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
-            Expanded(
-                child: Container(
-              child: ListView(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Text('Transactions '
-                        '${accState._transaction_history.length}:'),
-                  ),
-                  for (var i = accState._transaction_history.length - 1;
-                      i >= 0;
-                      i--)
-                    ListTile(
-                      leading: IconButton(
-                          icon: Icon(Icons.sync, semanticLabel: 'Delete'),
-                          onPressed: () => showDialog<String>(
-                                context: context,
-                                builder: (BuildContext context) => AlertDialog(
-                                    title: const Text("Rewind action"),
-                                    content: const Text(
-                                        "Do you really want to rewind your transaction history? Action cannot be undone."),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, 'Cancel'),
-                                        child: const Text('Cancel'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          accState.restore_state(i);
-                                          Navigator.pop(context, 'Cancel');
-                                        },
-                                        child: const Text('OK'),
-                                      ),
-                                    ]),
-                              )),
-                      title: Text(
-                          accState._transaction_history[i].amount.toString()),
-                    ),
-                ],
-              ),
-            )),
-            Consumer<AccountState>(builder: (context, acc, child) {
-              return Card(
-                child: Padding(
-                    padding: const EdgeInsets.all(40),
-                    child: Row(children: [
-                      Icon(
-                        Icons.account_balance,
-                        size: 32.0,
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 32.0),
-                          child: Center(
-                              child:
-                                  Text(acc._current_money.toString() + " BTC")),
-                        ),
-                      ),
-                    ])),
-              );
-            }),
-            SizedBox(
-              height: 10.0,
-            ),
-            Padding(
-                padding: const EdgeInsets.all(20),
-                child: TextFormField(
-                    controller: msgController,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                    onFieldSubmitted: (String? input) {
-                      msgController.clear();
-                    },
-                    decoration: const InputDecoration(
-                      icon: Icon(Icons.attach_money),
-                      hintText: 'Enter amount to be sent or received',
-                      labelText: 'Transaction',
-                    ))),
-            SizedBox(
-              height: 30.0,
-            ),
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.vertical_align_bottom,
-                      size: 50.0,
-                    ),
-                    onPressed: () {
-                      accState.receive(int.parse(msgController.text ?? '0'));
-                      FocusManager.instance.primaryFocus?.unfocus();
-                    },
-                  ),
-                  SizedBox(width: 50.0),
-                  IconButton(
-                    icon: Icon(
-                      Icons.vertical_align_top,
-                      size: 50.0,
-                    ),
-                    onPressed: () {
-                      accState.send(int.parse(msgController.text ?? '0'));
-                      FocusManager.instance.primaryFocus?.unfocus();
-                    },
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 30.0,
-            )
+            Expanded(child: TransactionsList()),
+            CurrentBalanceCard(),
+            SizedBox(height: 10.0),
+            TransactionInputField(msgController: msgController),
+            SizedBox(height: 30.0),
+            TransactionButtons(msgController: msgController),
+            SizedBox(height: 30.0),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class TransactionInputField extends StatelessWidget {
+  final TextEditingController msgController;
+
+  TransactionInputField({required this.msgController});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: TextFormField(
+        controller: msgController,
+        keyboardType: TextInputType.number,
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.digitsOnly
+        ],
+        onFieldSubmitted: (String? input) {
+          msgController.clear();
+        },
+        decoration: const InputDecoration(
+          icon: Icon(Icons.attach_money),
+          hintText: 'Enter amount to be sent or received',
+          labelText: 'Transaction',
+        ),
+      ),
+    );
+  }
+}
+
+
+class TransactionsList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var accState = context.watch<AccountState>();
+
+    return Container(
+      child: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child:
+                Text('Transactions ${accState._transaction_history.length}:'),
+          ),
+          for (var i = accState._transaction_history.length - 1; i >= 0; i--)
+            TransactionItem(index: i),
+        ],
+      ),
+    );
+  }
+}
+
+class TransactionItem extends StatelessWidget {
+  final int index;
+
+  TransactionItem({required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    var accState = context.watch<AccountState>();
+
+    return ListTile(
+      leading: IconButton(
+        icon: Icon(Icons.sync, semanticLabel: 'Delete'),
+        onPressed: () => showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text("Rewind action"),
+            content: const Text(
+                "Do you really want to rewind your transaction history? Action cannot be undone."),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'Cancel'),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  accState.restore_state(index);
+                  Navigator.pop(context, 'Cancel');
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        ),
+      ),
+      title: Text(accState._transaction_history[index].amount.toString()),
+    );
+  }
+}
+
+class CurrentBalanceCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AccountState>(builder: (context, acc, child) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(40),
+          child: Row(children: [
+            Icon(
+              Icons.account_balance,
+              size: 32.0,
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 32.0),
+                child:
+                    Center(child: Text(acc._current_money.toString() + " BTC")),
+              ),
+            ),
+          ]),
+        ),
+      );
+    });
+  }
+}
+
+
+class TransactionButtons extends StatelessWidget {
+  final TextEditingController msgController;
+
+  TransactionButtons({required this.msgController});
+
+  @override
+  Widget build(BuildContext context) {
+    var accState = context.watch<AccountState>();
+
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: Icon(
+              Icons.vertical_align_bottom,
+              size: 50.0,
+            ),
+            onPressed: () {
+              accState.receive(int.parse(msgController.text ?? '0'));
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
+          ),
+          SizedBox(width: 50.0),
+          IconButton(
+            icon: Icon(
+              Icons.vertical_align_top,
+              size: 50.0,
+            ),
+            onPressed: () {
+              accState.send(int.parse(msgController.text ?? '0'));
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
+          ),
+        ],
       ),
     );
   }

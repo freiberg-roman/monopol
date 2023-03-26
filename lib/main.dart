@@ -60,16 +60,31 @@ class AccountState extends ChangeNotifier {
   }
 }
 
+
 class MyHomePage extends StatelessWidget {
   final TextEditingController msgController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Monopoly Banking'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.history),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => TransactionHistoryPage()),
+              );
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            Expanded(child: TransactionsList()),
+            // Remove the Expanded(child: TransactionsList()) line
             CurrentBalanceCard(),
             SizedBox(height: 10.0),
             TransactionInputField(msgController: msgController),
@@ -82,6 +97,7 @@ class MyHomePage extends StatelessWidget {
     );
   }
 }
+
 
 class TransactionInputField extends StatelessWidget {
   final TextEditingController msgController;
@@ -234,6 +250,20 @@ class TransactionButtons extends StatelessWidget {
             },
           ),
         ],
+      ),
+    );
+  }
+}
+
+class TransactionHistoryPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Transaction History'),
+      ),
+      body: SafeArea(
+        child: TransactionsList(),
       ),
     );
   }

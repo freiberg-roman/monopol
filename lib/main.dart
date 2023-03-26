@@ -84,7 +84,6 @@ class MyHomePage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Remove the Expanded(child: TransactionsList()) line
             CurrentBalanceCard(),
             SizedBox(height: 10.0),
             TransactionInputField(msgController: msgController),
@@ -204,7 +203,7 @@ class CurrentBalanceCard extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(right: 32.0),
                 child:
-                    Center(child: Text(acc._current_money.toString() + " BTC")),
+                    Center(child: Text(acc._current_money.toString() + " \$")),
               ),
             ),
           ]),
@@ -213,7 +212,6 @@ class CurrentBalanceCard extends StatelessWidget {
     });
   }
 }
-
 
 class TransactionButtons extends StatelessWidget {
   final TextEditingController msgController;
@@ -228,24 +226,34 @@ class TransactionButtons extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          IconButton(
-            icon: Icon(
-              Icons.vertical_align_bottom,
-              size: 50.0,
+          ElevatedButton.icon(
+            icon: Icon(Icons.add, size: 24.0),
+            label: Text('Receive'),
+            style: ElevatedButton.styleFrom(
+              primary: Colors.green,
+              onPrimary: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              textStyle: TextStyle(fontSize: 18),
             ),
             onPressed: () {
               accState.receive(int.parse(msgController.text ?? '0'));
+              msgController.clear();
               FocusManager.instance.primaryFocus?.unfocus();
             },
           ),
-          SizedBox(width: 50.0),
-          IconButton(
-            icon: Icon(
-              Icons.vertical_align_top,
-              size: 50.0,
+          SizedBox(width: 20.0),
+          ElevatedButton.icon(
+            icon: Icon(Icons.remove, size: 24.0),
+            label: Text('Send'),
+            style: ElevatedButton.styleFrom(
+              primary: Colors.red,
+              onPrimary: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              textStyle: TextStyle(fontSize: 18),
             ),
             onPressed: () {
               accState.send(int.parse(msgController.text ?? '0'));
+              msgController.clear();
               FocusManager.instance.primaryFocus?.unfocus();
             },
           ),
